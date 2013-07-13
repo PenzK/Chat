@@ -40,8 +40,9 @@ public class Parser {
 	public static void getRooms(String jsonString,List<Room> list) throws ParserException{
 		try {
 			JSONObject json = new JSONObject(jsonString);
-			JSONArray arr=json.getJSONArray("rooms");
+			
 			if(json.getString("status").equals("ok")){
+				JSONArray arr=json.getJSONArray("rooms");
 				for(int i = 0;i<arr.length();i++){
 					JSONObject j = (JSONObject)arr.get(i);
 					list.add(new Room(j.getString("name")).setPeopleCount(j.getInt("people_count")).setStatus(Status.valueOf(j.getString("status"))));

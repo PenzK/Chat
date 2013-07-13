@@ -1,5 +1,6 @@
 package com.KPenz.chat;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -28,6 +29,7 @@ public class RoomsActivity extends BaseActivity {
 					long itemId) {
 				// TODO Auto-generated method stub
 				//Toast.makeText(rooms_activity.this, items[position], Toast.LENGTH_SHORT).show();
+				startActivity(new Intent(RoomsActivity.this,ChatActivity.class));
 			}
 		});
 	    listview.setOnItemLongClickListener(new OnItemLongClickListener() {
@@ -50,6 +52,13 @@ public class RoomsActivity extends BaseActivity {
 			}
 		    listview.setAdapter(mAdapter);
 	}
+	@Override
+	public void onBackPressed(){
+//		android.os.Process.killProcess(android.os.Process.myPid());
+		stopSystem();
+		super.onBackPressed();
+	}
+	
 //	public boolean onCreateOptionsMenu(Menu menu){
 //		getMenuInflater().inflate(R.menu.rooms_menu, menu);
 //		return super.onCreateOptionsMenu(menu);

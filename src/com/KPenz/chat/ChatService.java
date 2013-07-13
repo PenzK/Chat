@@ -23,6 +23,10 @@ public class ChatService extends Service {
 			this.srv=srv;
 		}
 	}
+	public void onDestroy(){
+		mApi = null;
+		super.onDestroy();
+	}
 	public Api getApi(){
 		return mApi;
 	}

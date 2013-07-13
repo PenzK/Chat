@@ -1,21 +1,17 @@
 package com.KPenz.chat;
 
 import android.app.Activity;
-import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.app.Service;
 import android.content.ComponentName;
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
-import android.view.View;
 
 abstract public class BaseActivity extends Activity {
-	
+	private Intent mIntent;
 	ProgressDialog pd;
 	Handler h;
 	private ServiceConnection mSrvConn;
@@ -23,9 +19,9 @@ abstract public class BaseActivity extends Activity {
 	protected void onCreate (Bundle b){
 		super.onCreate(b);
 		setContentView(R.layout.activity_base);
-		Intent intent = new Intent();
-		intent.setClass(this,ChatService.class);
-		startService(intent);
+		mIntent = new Intent();
+		mIntent.setClass(this,ChatService.class);
+		startService(mIntent);
 		mSrvConn= new ServiceConnection() {
 			
 			@Override
@@ -42,12 +38,15 @@ abstract public class BaseActivity extends Activity {
 				
 			}
 		};
-		bindService(intent, mSrvConn, Service.BIND_AUTO_CREATE);
+		bindService(mIntent, mSrvConn, Service.BIND_AUTO_CREATE);
 	}
 	abstract protected void onConnectedToService();
 	public void onDestroy(){
 		unbindService(mSrvConn);
 		super.onDestroy();
+	}
+	protected final void stopSystem(){
+		stopService(mIntent);
 	}
 //	public void onCLick(View v){
 //		switch(v.getId()){

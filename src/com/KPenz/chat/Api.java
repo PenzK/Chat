@@ -18,7 +18,7 @@ import com.KPenz.chat.Parser.ParserException;
 import android.util.Log;
 
 public class Api {
-	private static final String BASE_URL="http://188.0.150.89:6606";
+	private static final String BASE_URL="http://10.2.1.38:6606";
 	private AuthInfo mAuthInfo;
 	private boolean isAuth=false;
 	public void reg(Person p){
@@ -118,7 +118,7 @@ public class Api {
 	    
 	    public List<Room> getRooms() throws ParserException{
 	    	List<Room> list = new ArrayList<Room>();
-	    	String jsonResp=connect(BASE_URL+"/rooms?"+mAuthInfo.mToken);
+	    	String jsonResp=connect(BASE_URL+"/rooms?token="+mAuthInfo.mToken);
 	    	Parser.getRooms(jsonResp, list);
 	    	return list;
 	    }
