@@ -13,37 +13,64 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 
-import com.KPenz.chat.Parser.ParserException;
-
+import android.os.Handler;
 import android.util.Log;
 
+import com.KPenz.chat.Parser.ParserException;
+
 public class Api {
-	private static final String BASE_URL="http://10.2.1.38:6606";
+	private static final String BASE_URL="http://10.2.1.12:6606";
 	private AuthInfo mAuthInfo;
 	private boolean isAuth=false;
+	private final Object mSyncObject = new Object();
+	private final Handler mHandler = new Handler();
+	
 	public void reg(Person p){
     	connect(BASE_URL+"/reg?email="+p.mEmail+"&pass="+p.mPass+"&sex="+p.mSex+"&age="+p.mAge+"&nick="+p.mNickname);
     	
 	}
-    public void auth(String email, String pass) throws ApiException{
-    	if(isAuth==false){
-    		isAuth=true;
+    
+	public void auth(final String email,final String pass,final AuthCallback callback) {
+    	synchronized(mSyncObject){
+    
+    		if(isAuth==true){
+    			callback.onAuthCallbackFailed("Already logged");
+    		}
+    	}
+    	Thread thread = new Thread("AuthThread"){
+    		@Override
+    		public void run(){
+    			 try {
+        			 
+    				 String resp = connect(BASE_URL+"/auth?email="+email+"&pass="+pass);
+        			 mAuthInfo = Parser.Auth(resp);
+        			 isAuth=true;
+        			 mHandler.post(new Runnable() {
+						
+						@Override
+						public void run() {
+							// TODO Auto-generated method stub
+							callback.onAuthCallbackSuccess();
+						}
+					});
+        		 }
+        		 catch(final Exception e){
+        			
+        			mHandler.post(new Runnable() {
+						
+						@Override
+						public void run() {
+							// TODO Auto-generated method stub
+							callback.onAuthCallbackFailed(e.getMessage());
+						}
+					});
+        		 }
+    		}
+    	};
+    	thread.start();
     		
-    		 try {
-    			 String resp = connect(BASE_URL+"/auth?email="+email+"&pass="+pass);
-    			 mAuthInfo = Parser.Auth(resp);
-    		 }
-    		 catch(Exception e){
-    			
-    			throw new ApiException(e); 
-    			
-    		 }
-    		 
-    	}
-    	else{
-    		throw new ApiException("Already logged in!");
-    	}
     }
+    
 	public static String connect(String url)
 	{
 
@@ -121,5 +148,10 @@ public class Api {
 	    	String jsonResp=connect(BASE_URL+"/rooms?token="+mAuthInfo.mToken);
 	    	Parser.getRooms(jsonResp, list);
 	    	return list;
+	    }
+	    
+	    public interface AuthCallback {
+	    	public void onAuthCallbackSuccess();
+	    	public void onAuthCallbackFailed(String message);
 	    }
 }
