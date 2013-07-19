@@ -2,6 +2,7 @@ package com.KPenz.chat;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -13,6 +14,7 @@ import com.KPenz.chat.Parser.ParserException;
 public class RoomsActivity extends BaseActivity {
 	private RoomsAdapter mAdapter;
 	private ListView listview;
+	private final Handler mHandler = new Handler();
 	
 	public void onCreate(Bundle savedInstanceState) {
 	    super.onCreate(savedInstanceState);
@@ -44,20 +46,40 @@ public class RoomsActivity extends BaseActivity {
 	}
 	@Override
 	protected void onConnectedToService() {
-		 try {
-				mAdapter = new RoomsAdapter(this,mCore.getApi().getRooms());
-			} catch (ParserException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+		Thread roomThread = new  Thread("RoomThread") {
+			
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				mHandler.post(new Runnable() {
+					
+					@Override
+					public void run() {
+						// TODO Auto-generated method stub
+						getChatRooms();
+					}
+				});
 			}
-		    listview.setAdapter(mAdapter);
-	}
+		};
+				
+		roomThread.start();	
+	}		
+		
 	@Override
 	public void onBackPressed(){
 //		android.os.Process.killProcess(android.os.Process.myPid());
 		stopSystem();
 		super.onBackPressed();
 	}
+	public void getChatRooms(){
+		try {
+			mAdapter = new RoomsAdapter(this,mCore.getApi().getRooms());
+		} catch (ParserException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	    listview.setAdapter(mAdapter);
+}
 	
 //	public boolean onCreateOptionsMenu(Menu menu){
 //		getMenuInflater().inflate(R.menu.rooms_menu, menu);
@@ -113,5 +135,5 @@ public class RoomsActivity extends BaseActivity {
 //		return builder.create();
 //	}
 
-
+	
 }

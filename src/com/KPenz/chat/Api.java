@@ -19,7 +19,7 @@ import android.util.Log;
 import com.KPenz.chat.Parser.ParserException;
 
 public class Api {
-	private static final String BASE_URL="http://10.2.1.12:6606";
+	private static final String BASE_URL="http://188.0.149.109:6606";
 	private AuthInfo mAuthInfo;
 	private boolean isAuth=false;
 	private final Object mSyncObject = new Object();
